@@ -21,7 +21,7 @@ namespace QLDatPhongKhachSan.Controllers
         public async Task<IActionResult> GetAllKhachHang()
         {
             List<KhachHang> khachHangs = null;
-            khachHangs = await _context.Set<KhachHang>().FromSqlInterpolated($"Exec spAPI_GetAllKhachHang").ToListAsync();
+            khachHangs = await _context.Set<KhachHang>().FromSqlInterpolated($"Exec spAPI_GetAll_KhachHang").ToListAsync();
             return Ok(khachHangs);
         }
     }
