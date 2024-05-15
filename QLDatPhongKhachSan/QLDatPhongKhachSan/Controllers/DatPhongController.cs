@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QLDatPhongKhachSan.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,6 +18,14 @@ namespace QLDatPhongKhachSan.Controllers
         }
 
         //code o day
+        [HttpGet]
+        public async Task<IActionResult> GetDatPhongByMaDP(string MaDP)
+        {
+            List<DatPhong> datPhongs = null;
+            datPhongs = await _context.Set<DatPhong>().FromSqlInterpolated($"Exec spAPI_Get_DatPhong_ByMaDP {MaDP}").ToListAsync();
+            return Ok(datPhongs);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddDatPhong(string MaDatPhong, string MaKH, string MaPhong, string MaNV, DateTime NgayDat, DateTime NgayNhanPhong, DateTime NgayTraPhong, bool DaThanhToan)
         {

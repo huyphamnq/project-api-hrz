@@ -15,7 +15,8 @@ namespace QLDatPhongKhachSan.Data
         public string MaNV { get; set; }
         [Required]
         public DateTime NgayDat { get; set; }
-        public DateTime NgayTra { get; set; }
+        public DateTime NgayNhanPhong { get; set; }
+        public DateTime NgayTraPhong { get; set; }
         public int SoTienPhaiTra { get; set; }
         public bool DaThanhToan { get; set; }
     }
