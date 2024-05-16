@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLDatPhongKhachSan.Data;
+using System;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,12 +19,22 @@ namespace QLDatPhongKhachSan.Controllers
         }
 
         //code o day
-        [HttpGet]
-        public async Task<IActionResult> GetDatPhongByMaDP(string MaDP)
+        [HttpGet("{MaDatPhong}")]
+        public async Task<IActionResult> GetDatPhongByMaDP(string MaDatPhong)
         {
-            List<DatPhong> datPhongs = null;
-            datPhongs = await _context.Set<DatPhong>().FromSqlInterpolated($"Exec spAPI_Get_DatPhong_ByMaDP {MaDP}").ToListAsync();
-            return Ok(datPhongs);
+            try
+            {
+                var datphongs = await _context.Set<DatPhong>().FromSqlInterpolated($"Exec spAPI_Get_DatPhong_ByMaDP {MaDatPhong}").ToListAsync();
+                if (datphongs == null || datphongs.Count == 0)
+                {
+                    return NotFound("Chưa có đơn đặt phòng");
+                }
+                return Ok(datphongs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
+            }
         }
 
         [HttpPost]
@@ -31,9 +42,7 @@ namespace QLDatPhongKhachSan.Controllers
         {
             try
             {
-                await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"Exec spAPI_Add_DatPhong {MaDatPhong}, {MaKH}, {MaPhong}, {MaNV}, {NgayDat}, {NgayNhanPhong}, {NgayTraPhong}, {DaThanhToan}"
-                );
+                await _context.Database.ExecuteSqlInterpolatedAsync($"Exec spAPI_Add_DatPhong {MaDatPhong}, {MaKH}, {MaPhong}, {MaNV}, {NgayDat}, {NgayNhanPhong}, {NgayTraPhong}, {DaThanhToan}");
                 return Ok("Đặt phòng thành công");
             }
             catch (Exception ex)
@@ -42,7 +51,7 @@ namespace QLDatPhongKhachSan.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{MaDatPhong}")]
         public async Task<IActionResult> UpdateDatPhongByMaDP(string MaDatPhong, string MaKH, string MaPhong, string MaNV, DateTime NgayDat, DateTime NgayNhanPhong, DateTime NgayTraPhong, bool DaThanhToan)
         {
             try
@@ -54,18 +63,16 @@ namespace QLDatPhongKhachSan.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi khi đặt phòng: " + ex.Message);
+                return StatusCode(500, "Đã xảy ra lỗi khi sửa đặt phòng: " + ex.Message);
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{MaKH}")]
         public async Task<IActionResult> DeleteDatPhongByMaKH(string MaKH)
         {
             try
             {
-                await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"Exec spAPI_Delete_DatPhong_ByMaKH {MaKH}"
-                );
+                await _context.Database.ExecuteSqlInterpolatedAsync($"Exec spAPI_Delete_DatPhong_ByMaKH {MaKH}");
                 return Ok("Huỷ đặt phòng thành công");
             }
             catch (Exception ex)

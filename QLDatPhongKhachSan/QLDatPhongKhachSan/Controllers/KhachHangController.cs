@@ -18,45 +18,46 @@ namespace QLDatPhongKhachSan.Controllers
 
         // code o day
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllKhachHang()
-        //{
-        //    List<KhachHang> khachHangs = null;
-        //    khachHangs = await _context.Set<KhachHang>().FromSqlInterpolated($"Exec spAPI_GetAll_KhachHang").ToListAsync();
-        //    return Ok(khachHangs);
-        //}
-
         [HttpGet]
-        public async Task<IActionResult> GetKhachHang(string MaKH)
+        public async Task<IActionResult> GetAllKhachHang()
         {
-            var parameters = new[]
-            {
-                new SqlParameter("@MaKH", MaKH)
-            };
-
-            var khachHang = await _context.khachHangs.FromSqlRaw("EXEC spAPI_Get_KhachHang_ByMaKH @MaKH", parameters).ToListAsync();
-            if (khachHang.Count == null)
-            {
-                return NotFound("Khách hàng không tồn tại:");
-            }
-            return Ok(khachHang);
+            List<KhachHang> khachHangs = null;
+            khachHangs = await _context.Set<KhachHang>().FromSqlInterpolated($"Exec spAPI_GetAll_KhachHang").ToListAsync();
+            return Ok(khachHangs);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateKhachHang(string MaKH, string HoTen, string DiaChi, string DienThoai)
+        [HttpGet("{MaKH}")]
+        public async Task<IActionResult> GetKhachHangByMaKH(string MaKH)
         {
             try
             {
-                await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"EXEC spAPI_Update_KhachHang_ByMaKH {MaKH}, {HoTen}, {DiaChi}, {DienThoai}"
-                );
-                return Ok("Cập nhật thành công");
+                var khachHangs = await _context.Set<KhachHang>().FromSqlInterpolated($"Exec spAPI_Get_KhachHang_ByMaKH {MaKH}").ToListAsync();
+                if (khachHangs == null || khachHangs.Count == 0)
+                {
+                    return NotFound("Khách hàng không tồn tại");
+                }
+                return Ok(khachHangs);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
             }
         }
+
+
+        [HttpPut("{MaKH}")]
+        public async Task<IActionResult> UpdateKhachHang(string MaKH, string HoTen, string DiaChi, string DienThoai)
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync($"Exec spAPI_Update_KhachHang_ByMaKH {MaKH}, {HoTen}, {DiaChi}, {DienThoai}");
+                return Ok("Sửa thông tin khách hàng thành công");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Đã xảy ra lỗi khi sửa thông tin khách hàng: " + ex.Message);
+            }
+        }
+
     }
 }
