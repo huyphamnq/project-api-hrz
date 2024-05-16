@@ -20,5 +20,36 @@ namespace QLDatPhongKhachSan.Controllers
         }
 
         //code o day
+        [HttpPost]
+        public async Task<IActionResult> AddPhong(string MaPhong, string TenPhong, string LoaiPhong, int GiaTienMotNgay, string TinhTrang)
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"Exec spAPI_AddRoom {MaPhong}, {TenPhong}, {LoaiPhong}, {GiaTienMotNgay}, {TinhTrang}"
+                );
+                return Ok("Đặt phòng thành công");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Đã xảy ra lỗi khi đặt phòng: " + ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeletePhong(string MaPhong)
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"Exec spAPI_DeleteRoom {MaPhong}"
+                );
+                return Ok("Xóa phòng thành công");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Đã xảy ra lỗi khi xóa phòng: " + ex.Message);
+            }
+        }
     }
 }
